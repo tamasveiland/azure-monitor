@@ -1,0 +1,369 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "parameters": [
+          {
+            "id": "eddb3313-641d-4429-b467-4793d6ed3575",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "where type =~ \"microsoft.web/sites\"\r\n| summarize count() by subscriptionId\r\n| order by subscriptionId asc\r\n| project subscriptionId, label=subscriptionId, selected=row_number()==1",
+            "crossComponentResources": [
+              "value::all"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          },
+          {
+            "id": "8beaeea6-9550-4574-a51e-bb0c16e68e84",
+            "version": "KqlParameterItem/1.0",
+            "name": "ContainerApp",
+            "type": 5,
+            "description": "global parameter set by selection in the grid",
+            "isRequired": true,
+            "isGlobal": true,
+            "query": "where type =~ \"microsoft.app/containerapps\"\r\n| project value = id, label = name",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [],
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources",
+            "value": "/subscriptions/e189eefe-81af-4a39-9a8a-48eca8080032/resourceGroups/rg-search-demo/providers/Microsoft.App/containerApps/ca-web-6mry3itdlzc7c"
+          },
+          {
+            "id": "0311fb5a-33ca-48bd-a8f3-d3f57037a741",
+            "version": "KqlParameterItem/1.0",
+            "name": "properties",
+            "type": 1,
+            "isRequired": true,
+            "isGlobal": true,
+            "isHiddenWhenLocked": true,
+            "value": "{\"name\":\"ca-web-6mry3itdlzc7c\",\"resourceGroup\":\"rg-search-demo\",\"RunningStatus\":\"Running\",\"id\":\"/subscriptions/e189eefe-81af-4a39-9a8a-48eca8080032/resourceGroups/rg-search-demo/providers/Microsoft.App/containerApps/ca-web-6mry3itdlzc7c\",\"ParentId\":\"/subscriptions/e189eefe-81af-4a39-9a8a-48eca8080032/resourceGroups/rg-search-demo/providers/Microsoft.App/managedEnvironments/cae-6mry3itdlzc7c\"}"
+          },
+          {
+            "version": "KqlParameterItem/1.0",
+            "name": "Revision",
+            "type": 1,
+            "description": "global parameter set by selection in the grid",
+            "isRequired": true,
+            "isGlobal": true,
+            "id": "0a521873-9409-4f77-8edc-f5b9462e4e5e",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "hidden"
+              ]
+            }
+          }
+        ],
+        "style": "above",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "parameters - 0"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "toolbar",
+        "links": [
+          {
+            "id": "7ea6a29e-fc83-40cb-a7c8-e57f157b1811",
+            "cellValue": "{ContainerApp}",
+            "linkTarget": "ArmAction",
+            "linkLabel": "Start",
+            "postText": "Start container app {ContainerApp:name}",
+            "style": "primary",
+            "icon": "Start",
+            "linkIsContextBlade": true,
+            "armActionContext": {
+              "path": "{ContainerApp}/start",
+              "headers": [],
+              "params": [
+                {
+                  "key": "api-version",
+                  "value": "2024-03-01"
+                }
+              ],
+              "httpMethod": "POST",
+              "title": "Start {ContainerApp:name}",
+              "description": "Attempt to start:\n\n{ContainerApp:grid}",
+              "runLabel": "Start"
+            }
+          },
+          {
+            "id": "676a0860-6ec8-4c4f-a3b8-a98af422ae47",
+            "cellValue": "{ContainerApp}",
+            "linkTarget": "ArmAction",
+            "linkLabel": "Stop",
+            "postText": "Stop website {ContainerApp:name}",
+            "style": "primary",
+            "icon": "Stop",
+            "linkIsContextBlade": true,
+            "armActionContext": {
+              "path": "{ContainerApp}/stop",
+              "headers": [],
+              "params": [
+                {
+                  "key": "api-version",
+                  "value": "2024-03-01"
+                }
+              ],
+              "httpMethod": "POST",
+              "title": "Stop {ContainerApp:name}",
+              "description": "# Attempt to Stop:\n\n{ContainerApp:grid}",
+              "runLabel": "Stop"
+            }
+          },
+          {
+            "id": "5e48925f-f84f-4a2d-8e69-6a4deb8a3007",
+            "cellValue": "{properties}",
+            "linkTarget": "CellDetails",
+            "linkLabel": "Properties",
+            "postText": "View the properties for Start website {site:name}",
+            "style": "secondary",
+            "icon": "Properties",
+            "linkIsContextBlade": true
+          }
+        ]
+      },
+      "name": "site toolbar"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "//where type =~ \"microsoft.app/containerapps\"\r\n//| extend properties=tostring(properties)\r\n//| project name, resourceGroup, id, RunningStatus = properties['runningStatus']\r\n\r\nResources\r\n| where type == 'microsoft.app/containerapps'\r\n| project name, resourceGroup, RunningStatus = properties.runningStatus, id, ParentId = strcat('', properties['managedEnvironmentId'])\r\n//| project-away \r\n| union (Resources\r\n| where type == 'microsoft.app/managedenvironments'\r\n| project-away type, tenantId, kind, location, subscriptionId, managedBy, apiVersion, sku, plan, properties, tags, zones, extendedLocation, systemData, identity\r\n| extend name, id, ParentId = '')",
+        "size": 1,
+        "showAnalytics": true,
+        "title": "Container Apps in Subscription {Subscription:name}",
+        "showRefreshButton": true,
+        "exportedParameters": [
+          {
+            "fieldName": "",
+            "parameterName": "properties",
+            "parameterType": 1
+          },
+          {
+            "fieldName": "id",
+            "parameterName": "ContainerApp",
+            "parameterType": 1
+          }
+        ],
+        "showExportToExcel": true,
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "id",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "ParentId",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "properties",
+              "formatter": 5
+            }
+          ],
+          "filter": true,
+          "hierarchySettings": {
+            "idColumn": "id",
+            "parentColumn": "ParentId",
+            "treeType": 0,
+            "expanderColumn": "name",
+            "expandTopLevel": true
+          }
+        },
+        "sortBy": []
+      },
+      "name": "query - 1",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "170b80ec-0df4-4171-a496-4709dc886956",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Revision(s)",
+            "subTarget": "1",
+            "style": "link"
+          },
+          {
+            "id": "8246c1ad-168c-4d1e-924c-acc635b7ce52",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Container App details",
+            "subTarget": "2",
+            "style": "link"
+          },
+          {
+            "id": "1a184a33-0e1e-4570-b1fb-2d5f88e7599d",
+            "cellValue": "selectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "Logs",
+            "subTarget": "3",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "links - 0"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "Please select a container app either in the drowndop control for the report parameter or by selecting a row in the above grid."
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "1"
+      },
+      "name": "text - 10"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"{ContainerApp}/revisions\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2024-03-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value[*]\",\"columns\":[{\"path\":\"$.id\",\"columnid\":\"id\",\"columnType\":\"string\"},{\"path\":\"$.name\",\"columnid\":\"name\",\"columnType\":\"string\"},{\"path\":\"$.properties.active\",\"columnid\":\"active\",\"columnType\":\"string\"},{\"path\":\"$.properties.runningState\",\"columnid\":\"isRunning\",\"columnType\":\"string\"},{\"path\":\"$.properties.healthState\",\"columnid\":\"healthState\",\"columnType\":\"string\"},{\"path\":\"$.properties.trafficWeight\",\"columnid\":\"trafficWeight\",\"columnType\":\"real\"},{\"path\":\"$.properties.replicas\",\"columnid\":\"replicas\",\"columnType\":\"long\"}]}}]}",
+        "size": 1,
+        "exportFieldName": "id",
+        "exportParameterName": "Revision",
+        "queryType": 12
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "1"
+      },
+      "name": "query - 8",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## Replica\r\nPlease select a revision from the above list!"
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "1"
+      },
+      "name": "text - 8"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"{Revision}/replicas\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2024-03-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"tablePath\":\"$.value[*]\",\"columns\":[{\"path\":\"$.id\",\"columnid\":\"id\"},{\"path\":\"$.name\",\"columnid\":\"name\",\"columnType\":\"string\"},{\"path\":\"$.properties.runningState\",\"columnid\":\"runningState\",\"columnType\":\"string\"},{\"path\":\"$.properties.runningStateDetails\",\"columnid\":\"runningStateDetails\",\"columnType\":\"string\"}]}}]}",
+        "size": 1,
+        "queryType": 12
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "1"
+      },
+      "name": "query - 7"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "{\"version\":\"ARMEndpoint/1.0\",\"data\":null,\"headers\":[],\"method\":\"GET\",\"path\":\"{ContainerApp}\",\"urlParams\":[{\"key\":\"api-version\",\"value\":\"2024-03-01\"}],\"batchDisabled\":false,\"transformers\":[{\"type\":\"jsonpath\",\"settings\":{\"columns\":[{\"path\":\"$.id\",\"columnid\":\"id\"},{\"path\":\"$.name\",\"columnid\":\"name\",\"columnType\":\"string\"},{\"path\":\"$.location\",\"columnid\":\"location\",\"columnType\":\"string\"},{\"path\":\"$.properties.runningStatus\",\"columnid\":\"runningState\",\"columnType\":\"string\"},{\"path\":\"$.properties.workloadProfileName\",\"columnid\":\"workloadProfile\",\"columnType\":\"string\"},{\"path\":\"$.properties.configuration.activeRevisionsMode\",\"columnid\":\"activeRevisionsMode\",\"columnType\":\"string\"},{\"path\":\"$.properties.template.scale.minReplicas\",\"columnid\":\"minReplicaCount\",\"columnType\":\"string\"},{\"path\":\"$.properties.template.scale.maxReplicas\",\"columnid\":\"maxReplicaCount\",\"columnType\":\"string\"}]}}]}",
+        "size": 4,
+        "queryType": 12,
+        "visualization": "table",
+        "mapSettings": {
+          "locInfo": "AzureLoc",
+          "labelSettings": "location",
+          "locInfoColumn": "location"
+        }
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "2"
+      },
+      "name": "query - 11"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ContainerAppSystemLogs_CL\r\n| where ContainerAppName_s == '{ContainerApp:label}'\r\n| project TimeGenerated, Level, Reason_s, Log_s, RevisionName_s, ReplicaName_s, EventSource_s",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "/subscriptions/e189eefe-81af-4a39-9a8a-48eca8080032/resourceGroups/rg-search-demo/providers/Microsoft.OperationalInsights/workspaces/log-6mry3itdlzc7c"
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "selectedTab",
+        "comparison": "isEqualTo",
+        "value": "3"
+      },
+      "name": "query - 10"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## How this workbook works\r\n1. The parameters step declares a `ContainerApp` resource parameter that is hidden in reading mode, but uses the same query as the grid.  this parameter is marked `global`, and has no default selection.   The parameters also declares a `properties` hidden text parameter. These parameters are [declared global](https://github.com/microsoft/Application-Insights-Workbooks/blob/master/Documentation/Parameters/Parameters.md#global-parameters) so they can be set by the grid below, but the toolbar can appear *above* the grid.\r\n\r\n2. The workbook has a links step, that renders as a toolbar.  This toolbar has items to start a container app, stop a container, and show the Azure Resourcve Graph properties for that container app.  The toolbar buttons all reference the `ContainerApp` parameter, which by default has no selection, so the toolbar buttons are disabled.  The start and stop buttons use the [ARM Action](https://github.com/microsoft/Application-Insights-Workbooks/blob/master/Documentation/Links/LinkActions.md#arm-action-settings) feature to run an action against the selected resource.\r\n\r\n3. The workbook has an Azure Resource Graph (ARG) query step, which queries for container apps in the selected subscriptions, and displays them in a grid (ordered by the hosting Container App Environment). When a row is selected, the selected resource is exported to the `ContainerApp` global parameter, causing start and stop buttons to become enabled.  The ARG properties are also exported to the `properties` parameter, causing the poperties button to become enabled.",
+        "style": "info"
+      },
+      "conditionalVisibility": {
+        "parameterName": "debug",
+        "comparison": "isEqualTo",
+        "value": "true"
+      },
+      "name": "text - 3"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
